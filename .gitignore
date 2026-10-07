@@ -1,0 +1,21 @@
+# Keep the published reports and the analysis scripts.
+# Raw extracts and raw results contain exported CRM data (including personal
+# identifiers) and are excluded from version control.
+
+# Extracted copies of the V0 and V1 SQL packages
+ref/
+
+# Raw analysis output: comparison JSONs, hash files, workbook dumps, run logs
+out/
+
+# Internal session notes, not part of the review findings
+CLAUDE_SESSION_HANDOFF.md
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
