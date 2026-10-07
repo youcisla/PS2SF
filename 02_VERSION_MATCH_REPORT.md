@@ -1,5 +1,7 @@
 # V0 to V1 match report (current CSV exports)
 
+Documents: [Executive summary](00_EXECUTIVE_SUMMARY.md) | [State of migration](01_STATE_OF_MIGRATION.md) | **Match report (you are here)** | [Wrap-up plan](03_WRAPUP_PLAN.md) | [Deferred changes](04_DEFERRED_MODIFICATIONS.md) | [README](README.md)
+
 Method: the comparison skips the SQL Developer echo line (`SQL> SELECT ...`) and the blank line after it, joins the two files on the business key, and classifies each cell difference as *business* (a real value change) or *cosmetic* (case only, NULL against empty string, whitespace, or trailing punctuation). Byte-identical means every shared column matches.
 
 Overall: 96.57% of 2,135,477 matched rows carry no business change; 88.53% are byte-identical.

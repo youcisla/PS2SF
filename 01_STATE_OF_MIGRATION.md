@@ -1,5 +1,7 @@
 # State of migration: PeopleSoft CSOADM to Salesforce Ascend
 
+Documents: [Executive summary](00_EXECUTIVE_SUMMARY.md) | **State of migration (you are here)** | [Match report](02_VERSION_MATCH_REPORT.md) | [Wrap-up plan](03_WRAPUP_PLAN.md) | [Deferred changes](04_DEFERRED_MODIFICATIONS.md) | [README](README.md)
+
 Read-only scan of `PS_2_SF` (V0 SQL scripts, the V1 SQL package, CSV exports and comparison workbooks). No source file was modified. All generated output lives in `YoucefVersion/`.
 
 ## Summary
@@ -7,7 +9,7 @@ Read-only scan of `PS_2_SF` (V0 SQL scripts, the V1 SQL package, CSV exports and
 - SQL: 64 V0 views; the V1 package contains 59 revised `_V1` views and 12 new shared or base views. `01_CREATE_ALL_V1_VIEWS.sql` deploys all 71 objects in one run; `00_PS_ASCEND_COMMON_V1.sql` is the standalone copy of the 6 shared views. The per-view files and the create-all script are identical (0 mismatches).
 - 5 V0 views have no V1 counterpart, by design: PS_ASCEND_NAA_GVG_STY_VW, PS_ASCEND_NAA_MBR_LVL_PDCT_VW, PS_ASCEND_OPERATING_ENTITY_VW, PS_ASGN_CMP_SRCH, PS_F1_SF_TO_CONV. Three are marked "no comparison needed" and two are out of scope in the review workbook.
 - CSV data: 42 pairs joined on their business key, 2,135,477 matched rows. 73,162 rows carry at least one business change, so 96.57% of matched rows have no business change and 88.53% are byte-identical.
-- Review workbook: 158 issues logged, 128 fixed in V1, 10 open business decisions, 8 partial fixes, 12 open recommendations.
+- Review workbook: 158 issues logged, 128 fixed in V1, 8 partial fixes, 12 open recommendations, 14 questions for the business.
 
 ## Per-view status
 

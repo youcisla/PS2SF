@@ -11,6 +11,9 @@ out/
 # Internal session notes, not part of the review findings
 CLAUDE_SESSION_HANDOFF.md
 
+# Local tooling state
+.claude-flow/
+
 # Python bytecode
 __pycache__/
 *.pyc

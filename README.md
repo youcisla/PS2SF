@@ -1,13 +1,19 @@
 # Migration review: PeopleSoft CSOADM to Salesforce Ascend
 
+Documents: [Executive summary (plain language)](00_EXECUTIVE_SUMMARY.md) | [01 State of migration](01_STATE_OF_MIGRATION.md) | [02 Match report](02_VERSION_MATCH_REPORT.md) | [03 Wrap-up plan](03_WRAPUP_PLAN.md) | [04 Deferred changes](04_DEFERRED_MODIFICATIONS.md) | **README (you are here)**
+
 Generated analysis for the INSEAD Advancement data migration review. Everything in this folder is
 generated output. No file outside this folder was created or modified, and the Excel workbooks in
 `PS_2_SF/Completed/` and `PS_2_SF/Testing/` were opened read-only and never written to.
 
 ## Reports
 
+Two layers: a plain-language summary for a general audience, and four technical documents. Every
+file carries the same navigation bar at the top, so you can move between them in any direction.
+
 | File | Content |
 |---|---|
+| `00_EXECUTIVE_SUMMARY.md` | Plain-language overview: bottom line, what remains, watch items |
 | `01_STATE_OF_MIGRATION.md` | Where the project stands: per-view status (SQL, data, workbook verdicts) |
 | `02_VERSION_MATCH_REPORT.md` | V0 against V1 match percentages per view, key join with business and cosmetic diff classification |
 | `03_WRAPUP_PLAN.md` | Remaining work in fastest order: data gaps, open decisions, partial fixes |

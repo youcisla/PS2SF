@@ -1,5 +1,7 @@
 # Deferred modification register (apply only after approval)
 
+Documents: [Executive summary](00_EXECUTIVE_SUMMARY.md) | [State of migration](01_STATE_OF_MIGRATION.md) | [Match report](02_VERSION_MATCH_REPORT.md) | [Wrap-up plan](03_WRAPUP_PLAN.md) | **Deferred changes (you are here)** | [README](README.md)
+
 ## 1. Exclusion `PS_AV_SF_GIFTS_EXCLUSION_VW`
 
 Verified against the V1 package (`fichiers_par_vue/`): 9 active occurrences in 8 files, plus 1 commented line.

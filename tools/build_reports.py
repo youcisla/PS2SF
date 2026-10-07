@@ -21,6 +21,26 @@ def load(name):
     return json.load(p.open(encoding="utf-8")) if p.exists() else None
 
 
+DOCS = [
+    ("00", "Executive summary", "00_EXECUTIVE_SUMMARY.md"),
+    ("01", "State of migration", "01_STATE_OF_MIGRATION.md"),
+    ("02", "Match report", "02_VERSION_MATCH_REPORT.md"),
+    ("03", "Wrap-up plan", "03_WRAPUP_PLAN.md"),
+    ("04", "Deferred changes", "04_DEFERRED_MODIFICATIONS.md"),
+    ("RD", "README", "README.md"),
+]
+
+
+def nav(here: str) -> str:
+    parts = []
+    for code, label, fname in DOCS:
+        if code == here:
+            parts.append(f"**{label} (you are here)**")
+        else:
+            parts.append(f"[{label}]({fname})")
+    return "Documents: " + " | ".join(parts)
+
+
 def main():
     sql = load("sql_report.json")
     csvd = load("csv_keydiff.json") or []
@@ -72,10 +92,93 @@ def main():
     v1_new = sql["v1_without_v0"]
     n_pairs = len([r for r in csvd if "matched_keys" in r])
 
+    decisions_total = len(wb["sheets"]["Decisions"]) - 1 if wb else 0
+    fixed_total = sum(d["fixed"] for d in per_file.values())
+    partial_total = sum(d["partial"] for d in per_file.values())
+    reco_total = sum(d["reco"] for d in per_file.values())
+    issues_total = fixed_total + sum(d["decision"] for d in per_file.values()) + partial_total + reco_total
+
+    # ============================ report 0: executive summary (plain language)
+    E = []
+    X = E.append
+    X("# Executive summary: PeopleSoft to Salesforce Ascend data migration review")
+    X("")
+    X(nav("00"))
+    X("")
+    X("## What this is")
+    X("")
+    X("This review checks the extract scripts that move INSEAD Advancement data from PeopleSoft "
+      "(Oracle, schema CSOADM) to Salesforce Ascend, together with the data those scripts produced. "
+      "It covers the original script package (called V0), the revised package (called V1), and the "
+      "export files of both versions. Everything was checked read-only; nothing in the source system "
+      "was changed.")
+    X("")
+    X("## Bottom line")
+    X("")
+    X(f"- The revised package is ready. {sql['v1_create_all_count']} database views deploy with a single "
+      "script, and the package is internally consistent (0 mismatches between its files).")
+    X(f"- The data holds up. Of {tot_matched:,} records compared between the old and new exports, "
+      f"{pct_business_clean}% carry no business change and {pct_identical}% are identical down to the "
+      "character. Every remaining difference traces to a deliberate fix, listed per view.")
+    X(f"- The review workbook logged {issues_total} issues; {fixed_total} are fixed in V1. The rest are "
+      f"{partial_total} partial fixes, {reco_total} recommendations, and {decisions_total} questions "
+      "for the business.")
+    X("- Three exports need to be re-run, and one cleanup pass (called V2) is planned but deliberately "
+      "not applied yet.")
+    X("")
+    X("## How the comparison worked")
+    X("")
+    X("Each old script was paired with its new version and compared as text. Each old export file was "
+      "paired with its new export and compared record by record, using the record's external ID as the "
+      "match key. Differences were classified two ways: cosmetic (capitalisation, NULL against empty "
+      "string, trailing spaces) and business (a real value change). Only business changes count against "
+      "the percentages above.")
+    X("")
+    X("## What remains before load")
+    X("")
+    X("1. Re-run the three missing or empty exports (details in the wrap-up plan, section A).")
+    X(f"2. Close the {decisions_total} questions for the business (wrap-up plan, section B). Each answer "
+      "is a parameter change or an accepted rule, not development work.")
+    X("3. Refresh the comparison workbooks for views re-exported since the last review.")
+    X("4. Apply the planned changes in one V2 pass (deferred changes document): remove the gift "
+      "exclusion clause, settle the currency question, and the recommendation items.")
+    X("")
+    X("## Watch items")
+    X("")
+    X("- External IDs changed for scholarship records (the fix intentionally added a timestamp). "
+      "Loading over data already in Ascend would create duplicates instead of updates.")
+    X("- Export files arrive in two different encodings, and every file starts with a command echo "
+      "line. Both need cleaning before the Salesforce load.")
+    X("- Do not re-run exports while a comparison workbook is open; the reviewed numbers will no "
+      "longer match the files.")
+    X("")
+    X("## Glossary")
+    X("")
+    X("| Term | Meaning |")
+    X("|---|---|")
+    X("| V0 | The original PeopleSoft extract scripts and their export files |")
+    X("| V1 | The revised script package delivered for this review |")
+    X("| Business change | A real value difference between V0 and V1 data |")
+    X("| Cosmetic change | Formatting-only difference (case, NULL against empty string, spaces) |")
+    X("| Match key | The external ID used to pair records between the V0 and V1 exports |")
+    X("")
+    X("## Where to find details")
+    X("")
+    X("| Question | Read |")
+    X("|---|---|")
+    X("| Where does each view stand? | [01 State of migration](01_STATE_OF_MIGRATION.md) |")
+    X("| Which views match, and by how much? | [02 Match report](02_VERSION_MATCH_REPORT.md) |")
+    X("| What is left to do, in order? | [03 Wrap-up plan](03_WRAPUP_PLAN.md) |")
+    X("| What changes are planned but not applied? | [04 Deferred changes](04_DEFERRED_MODIFICATIONS.md) |")
+    X("| How was this produced, and how do I re-run it? | [README](README.md) |")
+    X("")
+
     # ============================ report 1: state
     L = []
     A = L.append
     A("# State of migration: PeopleSoft CSOADM to Salesforce Ascend")
+    A("")
+    A(nav("01"))
     A("")
     A("Read-only scan of `PS_2_SF` (V0 SQL scripts, the V1 SQL package, CSV exports and comparison "
       "workbooks). No source file was modified. All generated output lives in `YoucefVersion/`.")
@@ -91,8 +194,9 @@ def main():
     A(f"- CSV data: {n_pairs} pairs joined on their business key, {tot_matched:,} matched rows. "
       f"{tot_business:,} rows carry at least one business change, so {pct_business_clean}% of matched rows "
       f"have no business change and {pct_identical}% are byte-identical.")
-    A("- Review workbook: 158 issues logged, 128 fixed in V1, 10 open business decisions, "
-      "8 partial fixes, 12 open recommendations.")
+    A(f"- Review workbook: {issues_total} issues logged, {fixed_total} fixed in V1, "
+      f"{partial_total} partial fixes, {reco_total} open recommendations, {decisions_total} questions "
+      "for the business.")
     A("")
     A("## Per-view status")
     A("")
@@ -121,6 +225,8 @@ def main():
     M = []
     B = M.append
     B("# V0 to V1 match report (current CSV exports)")
+    B("")
+    B(nav("02"))
     B("")
     B("Method: the comparison skips the SQL Developer echo line (`SQL> SELECT ...`) and the blank line "
       "after it, joins the two files on the business key, and classifies each cell difference as "
@@ -153,6 +259,8 @@ def main():
     W = []
     C = W.append
     C("# Wrap-up plan: remaining work in fastest order")
+    C("")
+    C(nav("03"))
     C("")
     C("## A. Data gaps (export work only)")
     C("")
@@ -206,6 +314,8 @@ def main():
     R = []
     D = R.append
     D("# Deferred modification register (apply only after approval)")
+    D("")
+    D(nav("04"))
     D("")
     D("## 1. Exclusion `PS_AV_SF_GIFTS_EXCLUSION_VW`")
     D("")
@@ -277,6 +387,7 @@ def main():
       "from the CSVs.")
     D("")
 
+    (ROOT / "00_EXECUTIVE_SUMMARY.md").write_text("\n".join(E), encoding="utf-8")
     (ROOT / "01_STATE_OF_MIGRATION.md").write_text("\n".join(L), encoding="utf-8")
     (ROOT / "02_VERSION_MATCH_REPORT.md").write_text("\n".join(M), encoding="utf-8")
     (ROOT / "03_WRAPUP_PLAN.md").write_text("\n".join(W), encoding="utf-8")
